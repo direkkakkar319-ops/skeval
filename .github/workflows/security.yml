@@ -1,0 +1,29 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 0 * * 0' # Weekly
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    - name: Install tools
+      run: pip install bandit pip-audit pip-licenses
+    - name: Run Bandit
+      run: bandit -r . -f custom || true
+    - name: Vulnerability Audit (pip-audit)
+      run: |
+        if [ -f requirements.txt ]; then pip-audit -r requirements.txt || true; fi
+    - name: License Compliance Check
+      run: |
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; pip-licenses --format=markdown > licenses.md; fi

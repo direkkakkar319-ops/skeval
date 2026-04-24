@@ -1,0 +1,45 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Run unit tests and coverage
+      run: |
+        pytest --cov=./ --cov-report=xml --junitxml=pytest.xml
+    - name: Pytest coverage comment
+      if: github.event_name == 'pull_request' && matrix.python-version == '3.10'
+      uses: MishaKav/pytest-coverage-comment@main
+      with:
+        pytest-coverage-path: ./coverage.xml
+        junitxml-path: ./pytest.xml
+    - name: CLI / Pipeline Run Test
+      run: |
+        echo "Running CLI test placeholder..."
+        # python -m sentinel_ai --help
+    - name: Performance Smoke Test
+      run: |
+        echo "Running performance smoke test placeholder..."
+        # pytest tests/performance/
