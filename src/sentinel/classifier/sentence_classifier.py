@@ -4,9 +4,7 @@ from typing import List
 
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
 
-from sentinel.dataset.loader import collate_fn
 from sentinel.utils.helpers import LabelEncoder, VocabBuilder
 
 
@@ -93,7 +91,9 @@ class SentenceClassifier:
                 total_acc += (output.argmax(1) == targets).sum().item()
 
             print(
-                f"Epoch {epoch}/{epochs} | Loss: {total_loss/len(dataloader):.4f} | Acc: {total_acc/len(sentences):.4f}"
+                f"Epoch {epoch}/{epochs} | "
+                f"Loss: {total_loss / len(dataloader):.4f} | "
+                f"Acc: {total_acc / len(sentences):.4f}"
             )
 
     def predict(self, sentences: List[str]) -> List[str]:

@@ -24,7 +24,9 @@ class Evaluator:
         """
         if len(predictions) != len(ground_truth):
             raise ValueError(
-                f"Mismatch in lengths: {len(predictions)} predictions vs {len(ground_truth)} truth labels."
+                f"Mismatch in lengths: "
+                f"{len(predictions)} predictions vs "
+                f"{len(ground_truth)} truth labels."
             )
 
         results = compute_metrics(ground_truth, predictions)

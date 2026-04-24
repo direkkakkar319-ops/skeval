@@ -1,7 +1,5 @@
 import json
 
-import torch
-
 from sentinel.classifier import SentenceClassifier
 from sentinel.evaluator import Evaluator
 
