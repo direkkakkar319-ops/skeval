@@ -1,0 +1,50 @@
+# .github/labeler.yml
+# Maps PR labels to file path patterns.
+# See: https://github.com/actions/labeler
+
+"source":
+  - changed-files:
+    - any-glob-to-any-file: "src/**"
+
+"tests":
+  - changed-files:
+    - any-glob-to-any-file: "tests/**"
+
+"documentation":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "docs/**"
+      - "*.md"
+      - "*.rst"
+
+"CI/CD":
+  - changed-files:
+    - any-glob-to-any-file: ".github/**"
+
+"dependencies":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "requirements*.txt"
+      - "pyproject.toml"
+      - "setup.cfg"
+
+"configuration":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "configs/**"
+      - "*.yaml"
+      - "*.yml"
+      - "*.toml"
+      - "*.cfg"
+
+"scripts":
+  - changed-files:
+    - any-glob-to-any-file: "scripts/**"
+
+"notebooks":
+  - changed-files:
+    - any-glob-to-any-file: "notebooks/**"
+
+"data":
+  - changed-files:
+    - any-glob-to-any-file: "data/**"
