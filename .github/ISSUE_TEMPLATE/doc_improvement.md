@@ -1,3 +1,10 @@
+---
+name: Documentation Improvement
+about: Suggest an improvement to the documentation
+title: "[DOCS] "
+labels: documentation
+assignees: ''
+---
 #### Describe the issue linked to the documentation
 
 <!--
