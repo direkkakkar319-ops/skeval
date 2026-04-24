@@ -20,12 +20,12 @@ jobs:
               repo: context.repo.repo,
               affiliation: 'direct' // Direct collaborators
             });
-            
+
             // Extract usernames, excluding the PR author
             const reviewers = collaborators.data
               .map(user => user.login)
               .filter(login => login !== context.payload.pull_request.user.login);
-              
+
             if (reviewers.length > 0) {
               await github.rest.pulls.requestReviewers({
                 owner: context.repo.owner,
@@ -33,7 +33,7 @@ jobs:
                 pull_number: context.payload.pull_request.number,
                 reviewers: reviewers
               });
-              
+
               // Also add the PR author as the Assignee
               await github.rest.issues.addAssignees({
                 owner: context.repo.owner,
@@ -41,7 +41,7 @@ jobs:
                 issue_number: context.payload.pull_request.number,
                 assignees: [context.payload.pull_request.user.login]
               });
-              
+
               console.log(`Requested review from: ${reviewers.join(', ')}`);
             } else {
               console.log("No other collaborators found to assign as reviewers.");

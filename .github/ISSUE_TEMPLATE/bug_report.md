@@ -12,7 +12,7 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 <!--
-Add a Minimal, Complete, and Verifiable example 
+Add a Minimal, Complete, and Verifiable example
 -->
 
 ```python
