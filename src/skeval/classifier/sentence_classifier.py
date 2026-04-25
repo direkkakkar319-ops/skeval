@@ -170,6 +170,10 @@ class SentenceClassifier:
             num_classes=self.label_encoder.num_classes,
         ).to(self.device)
         self.model.load_state_dict(
-            torch.load(os.path.join(save_dir, "model.pt"), map_location=self.device)
+            torch.load(
+                os.path.join(save_dir, "model.pt"),
+                map_location=self.device,
+                weights_only=True,
+            )
         )
         self.model.eval()
