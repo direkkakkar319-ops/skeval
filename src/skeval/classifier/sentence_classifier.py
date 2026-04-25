@@ -31,7 +31,7 @@ class BasicTextClassifier(nn.Module):
 
 
 class SentenceClassifier:
-    """High-level Sentinel API to train and predict semantic sentence categories."""
+    """High-level skeval to train and predict semantic sentence categories."""
 
     def __init__(self, embed_dim: int = 64):
         self.embed_dim = embed_dim

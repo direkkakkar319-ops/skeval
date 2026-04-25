@@ -30,18 +30,10 @@ jobs:
         pip install -e . || true
     - name: Run unit tests and coverage
       run: |
-        pytest tests/ --cov=src/sentinel --cov-report=xml --junitxml=pytest.xml -v --tb=short || true
+        pytest tests/ --cov=src/skeval --cov-report=xml --junitxml=pytest.xml -v --tb=short
     - name: Pytest coverage comment
       if: github.event_name == 'pull_request' && matrix.python-version == '3.10'
       uses: MishaKav/pytest-coverage-comment@main
       with:
         pytest-coverage-path: ./coverage.xml
         junitxml-path: ./pytest.xml
-    - name: CLI / Pipeline Run Test
-      run: |
-        echo "Running CLI test placeholder..."
-        # python -m sentinel --help
-    - name: Performance Smoke Test
-      run: |
-        echo "Running performance smoke test placeholder..."
-        # pytest tests/performance/

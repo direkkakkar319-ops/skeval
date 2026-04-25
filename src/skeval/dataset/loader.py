@@ -33,7 +33,7 @@ class SentenceDataset(Dataset):
         encoded_sentence = self.vocab.encode(sentence)
         encoded_label = self.label_encoder.encode(label)
 
-        # Return as tensors
+        # Returning sentences and labels as tensors
         return torch.tensor(encoded_sentence, dtype=torch.long), torch.tensor(
             encoded_label, dtype=torch.long
         )

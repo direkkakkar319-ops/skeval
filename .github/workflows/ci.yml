@@ -19,8 +19,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        pip install -e . || true # Install local package if setup.py/pyproject.toml exists
-    - name: Install + Import Test
-      run: |
-        # Replace 'sentinel_ai' with actual package name
-        python -c "import sys; print('Import test passed')"
+        pip install -e .
+    - name: Import test
+      run: python -c "import skeval; print(skeval.__version__)"

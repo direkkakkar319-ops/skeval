@@ -97,7 +97,7 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 
 [tool.coverage.run]
-source = ["src/sentinel"]
+source = ["src/skeval"]
 omit = ["tests/*", "scripts/*"]
 
 [tool.coverage.report]
