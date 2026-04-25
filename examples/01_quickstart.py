@@ -17,10 +17,14 @@ sentences = [
     "Open the window right now",
 ]
 labels = [
-    "fact", "fact",
-    "emotion", "emotion",
-    "opinion", "opinion",
-    "instruction", "instruction",
+    "fact",
+    "fact",
+    "emotion",
+    "emotion",
+    "opinion",
+    "opinion",
+    "instruction",
+    "instruction",
 ]
 
 classifier = SentenceClassifier(embed_dim=64)
