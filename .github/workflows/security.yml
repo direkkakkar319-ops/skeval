@@ -27,6 +27,7 @@ jobs:
     - name: Run Bandit
       run: bandit -r src/ -ll
     - name: Vulnerability Audit (pip-audit)
-      run: pip-audit --skip-editable
+      # CVE-2026-3219 affects pip 26.0.1 — no fix version released yet, ignored until patch is available
+      run: pip-audit --skip-editable --ignore-vuln CVE-2026-3219
     - name: License Compliance Check
       run: pip-licenses --format=markdown > licenses.md
