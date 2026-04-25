@@ -84,8 +84,8 @@ sentinel-ai/
 ## ⚙️ Installation
 
 ```bash
-git clone https://github.com/your-username/sentinel-ai.git
-cd sentinel-ai
+git clone https://github.com/direkkakkar319-ops/Sentinel.AI.git
+cd Sentinel.AI
 pip install -e .
 ```
 
@@ -97,21 +97,26 @@ pip install -e .
 from sentinel.classifier import SentenceClassifier
 from sentinel.evaluator import Evaluator
 
-classifier = SentenceClassifier()
-evaluator = Evaluator()
-
 sentences = [
     "Water boils at 100 degrees Celsius",
     "I feel sad today",
-    "This movie is amazing",
+    "I think this movie is amazing",
+    "Please close the door",
 ]
+labels = ["fact", "emotion", "opinion", "instruction"]
 
-predictions = [classifier.predict(s) for s in sentences]
+classifier = SentenceClassifier(embed_dim=64)
+classifier.train(sentences, labels, epochs=20)
 
-# Example ground truth
-labels = ["fact", "emotion", "opinion"]
+predictions = classifier.predict([
+    "The sky is blue",
+    "I am so happy",
+    "I believe dogs are better than cats",
+    "Turn off the lights",
+])
 
-results = evaluator.evaluate(predictions, labels)
+evaluator = Evaluator()
+results = evaluator.evaluate(predictions, ["fact", "emotion", "opinion", "instruction"])
 print(results)
 ```
 
@@ -121,9 +126,12 @@ print(results)
 
 ```
 {
-  "accuracy": 0.66,
-  "confusion_matrix": [...],
-  "per_class_f1": {...}
+  "accuracy": 0.75,
+  "per_class": {"fact": {"precision": 1.0, "recall": 1.0, "f1-score": 1.0, ...}, ...},
+  "macro_avg": {"precision": ..., "recall": ..., "f1-score": ...},
+  "weighted_avg": {"precision": ..., "recall": ..., "f1-score": ...},
+  "confusion_matrix": [[...], ...],
+  "labels": ["emotion", "fact", "instruction", "opinion"]
 }
 ```
 
