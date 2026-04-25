@@ -20,10 +20,18 @@ train_sentences = [
     "Turn off the lights",
 ]
 train_labels = [
-    "fact", "fact", "fact",
-    "emotion", "emotion", "emotion",
-    "opinion", "opinion", "opinion",
-    "instruction", "instruction", "instruction",
+    "fact",
+    "fact",
+    "fact",
+    "emotion",
+    "emotion",
+    "emotion",
+    "opinion",
+    "opinion",
+    "opinion",
+    "instruction",
+    "instruction",
+    "instruction",
 ]
 
 classifier = SentenceClassifier(embed_dim=64)
