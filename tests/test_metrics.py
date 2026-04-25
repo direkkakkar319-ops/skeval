@@ -1,4 +1,4 @@
-from sentinel.metrics import compute_metrics
+from skeval.metrics import compute_metrics
 
 
 def test_compute_metrics():

@@ -1,7 +1,7 @@
 Architecture
 ============
 
-Sentinel AI is organized as a set of composable modules. Each module has a single responsibility, and they are designed to be used together or independently.
+skeval is organized as a set of composable modules. Each module has a single responsibility, and they are designed to be used together or independently.
 
 ----
 
@@ -66,7 +66,7 @@ Key Components
 VocabBuilder
 ^^^^^^^^^^^^
 
-Located in :mod:`sentinel.utils.helpers`.
+Located in :mod:`skeval.utils.helpers`.
 
 Builds a bag-of-words vocabulary from a list of sentences. Text is normalized (lowercased, punctuation stripped) before tokenization. Two special tokens are always present:
 
@@ -78,14 +78,14 @@ The ``min_freq`` parameter (default ``1``) filters out rare tokens.
 LabelEncoder
 ^^^^^^^^^^^^
 
-Located in :mod:`sentinel.utils.helpers`.
+Located in :mod:`skeval.utils.helpers`.
 
 Maps string labels to integer indices and back. Labels are sorted alphabetically before indexing so the mapping is deterministic across runs.
 
 BasicTextClassifier
 ^^^^^^^^^^^^^^^^^^^
 
-Located in :mod:`sentinel.classifier.sentence_classifier`.
+Located in :mod:`skeval.classifier.sentence_classifier`.
 
 A two-layer PyTorch model:
 
@@ -97,32 +97,32 @@ The model is intentionally minimal: it is fast to train on small datasets, inter
 SentenceDataset and collate_fn
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Located in :mod:`sentinel.dataset.loader`.
+Located in :mod:`skeval.dataset.loader`.
 
-:class:`~sentinel.dataset.loader.SentenceDataset` wraps encoded sentences and labels as a standard :class:`torch.utils.data.Dataset`. Because sentences have different lengths, the custom ``collate_fn`` packs them into a single 1-D tensor and computes ``offsets`` — the starting index of each sentence — so that :class:`~torch.nn.EmbeddingBag` can process the whole batch in one call.
+:class:`~skeval.dataset.loader.SentenceDataset` wraps encoded sentences and labels as a standard :class:`torch.utils.data.Dataset`. Because sentences have different lengths, the custom ``collate_fn`` packs them into a single 1-D tensor and computes ``offsets`` — the starting index of each sentence — so that :class:`~torch.nn.EmbeddingBag` can process the whole batch in one call.
 
 Evaluator and compute_metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Located in :mod:`sentinel.evaluator.evaluator` and :mod:`sentinel.metrics.metrics`.
+Located in :mod:`skeval.evaluator.evaluator` and :mod:`skeval.metrics.metrics`.
 
-:class:`~sentinel.evaluator.Evaluator` is a thin wrapper that validates input lengths and delegates to :func:`~sentinel.metrics.compute_metrics`. The metrics function uses scikit-learn internally for accuracy, per-class precision/recall/F1, and the confusion matrix, then reshapes the results into a consistent dictionary.
+:class:`~skeval.evaluator.Evaluator` is a thin wrapper that validates input lengths and delegates to :func:`~skeval.metrics.compute_metrics`. The metrics function uses scikit-learn internally for accuracy, per-class precision/recall/F1, and the confusion matrix, then reshapes the results into a consistent dictionary.
 
 ----
 
 Extending the Label Taxonomy
 -----------------------------
 
-The four default categories (``fact``, ``emotion``, ``opinion``, ``instruction``) are not hard-coded anywhere. Both :class:`~sentinel.utils.helpers.LabelEncoder` and :class:`~sentinel.classifier.SentenceClassifier` infer the label set from your training data at call time. To add a new category, include sentences with that label in your training set — no code changes required.
+The four default categories (``fact``, ``emotion``, ``opinion``, ``instruction``) are not hard-coded anywhere. Both :class:`~skeval.utils.helpers.LabelEncoder` and :class:`~skeval.classifier.SentenceClassifier` infer the label set from your training data at call time. To add a new category, include sentences with that label in your training set — no code changes required.
 
 ----
 
 Saving and Loading
 ------------------
 
-:meth:`~sentinel.classifier.SentenceClassifier.save` writes two files:
+:meth:`~skeval.classifier.SentenceClassifier.save` writes two files:
 
 * ``model.pt`` — PyTorch ``state_dict`` of the trained weights
 * ``metadata.json`` — ``embed_dim``, the full ``word2idx`` / ``idx2word`` vocabulary, and the full ``label2idx`` / ``idx2label`` mapping
 
-:meth:`~sentinel.classifier.SentenceClassifier.load` reconstructs the ``VocabBuilder`` and ``LabelEncoder`` from ``metadata.json``, then rebuilds the ``BasicTextClassifier`` with the correct architecture before loading the weights. This means a saved model is fully portable across machines.
+:meth:`~skeval.classifier.SentenceClassifier.load` reconstructs the ``VocabBuilder`` and ``LabelEncoder`` from ``metadata.json``, then rebuilds the ``BasicTextClassifier`` with the correct architecture before loading the weights. This means a saved model is fully portable across machines.

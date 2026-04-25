@@ -4,8 +4,8 @@ Sentinel AI imposes no fixed label set — you define the categories
 by what you put in your training data.
 """
 
-from sentinel.classifier import SentenceClassifier
-from sentinel.evaluator import Evaluator
+from skeval.classifier import SentenceClassifier
+from skeval.evaluator import Evaluator
 
 # Domain: customer support ticket classification
 sentences = [

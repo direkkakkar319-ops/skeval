@@ -1,6 +1,6 @@
 import os
 
-from sentinel.classifier import SentenceClassifier
+from skeval.classifier import SentenceClassifier
 
 
 def test_classifier_initialization():

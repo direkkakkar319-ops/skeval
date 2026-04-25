@@ -1,6 +1,6 @@
 import pytest
 
-from sentinel.evaluator import Evaluator
+from skeval.evaluator import Evaluator
 
 
 def test_evaluator():

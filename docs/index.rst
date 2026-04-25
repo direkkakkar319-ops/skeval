@@ -1,7 +1,7 @@
-Welcome to Sentinel AI
+Welcome to skeval
 ======================
 
-**Sentinel AI** is a lightweight PyTorch-powered library for classifying and evaluating the *semantic type* of sentences — facts, emotions, opinions, and instructions.
+**skeval** is a lightweight PyTorch-powered library for classifying and evaluating the *semantic type* of sentences — facts, emotions, opinions, and instructions.
 
 It fills the gap that standard LLM benchmarks leave open: not *how fluent* the output is, but *what kind of language* it uses.
 
@@ -31,8 +31,8 @@ Train a classifier and evaluate it in a few lines:
 
 .. code-block:: python
 
-   from sentinel.classifier import SentenceClassifier
-   from sentinel.evaluator import Evaluator
+   from skeval.classifier import SentenceClassifier
+   from skeval.evaluator import Evaluator
 
    classifier = SentenceClassifier(embed_dim=64)
 

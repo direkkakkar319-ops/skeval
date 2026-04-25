@@ -5,8 +5,8 @@ from pathlib import Path
 
 
 def _train(args):
-    from sentinel.classifier import SentenceClassifier
-    from sentinel.dataset.loader import DatasetLoader
+    from skeval.classifier import SentenceClassifier
+    from skeval.dataset.loader import DatasetLoader
 
     data_path = Path(args.data)
     if not data_path.exists():
@@ -35,9 +35,9 @@ def _train(args):
 
 
 def _evaluate(args):
-    from sentinel.classifier import SentenceClassifier
-    from sentinel.dataset.loader import DatasetLoader
-    from sentinel.evaluator import Evaluator
+    from skeval.classifier import SentenceClassifier
+    from skeval.dataset.loader import DatasetLoader
+    from skeval.evaluator import Evaluator
 
     model_path = Path(args.model_dir)
     if not (model_path / "model.pt").exists():
@@ -78,10 +78,10 @@ def _evaluate(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="sentinel",
+        prog="skeval",
         description="Sentinel AI — Semantic Evaluation Layer for LLMs",
     )
-    parser.add_argument("--version", action="version", version="sentinel-ai 0.1.1")
+    parser.add_argument("--version", action="version", version="skeval-ai 0.1.1")
     subparsers = parser.add_subparsers(dest="command", metavar="<command>")
     subparsers.required = True
 

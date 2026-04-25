@@ -2,8 +2,8 @@
 
 import json
 
-from sentinel.classifier import SentenceClassifier
-from sentinel.evaluator import Evaluator
+from skeval.classifier import SentenceClassifier
+from skeval.evaluator import Evaluator
 
 train_sentences = [
     "Water boils at 100 degrees Celsius",

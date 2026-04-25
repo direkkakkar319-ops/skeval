@@ -1,6 +1,6 @@
 """Save a trained model to disk and reload it in a new session."""
 
-from sentinel.classifier import SentenceClassifier
+from skeval.classifier import SentenceClassifier
 
 sentences = [
     "Water boils at 100 degrees Celsius",

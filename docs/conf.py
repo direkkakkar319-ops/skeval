@@ -4,9 +4,9 @@ import sys
 
 sys.path.insert(0, os.path.abspath("../src"))
 
-project = "Sentinel AI"
-copyright = "2026, Sentinel AI Contributors"
-author = "Sentinel AI Contributors"
+project = "skeval"
+copyright = "2026, skeval Contributors"
+author = "skeval Contributors"
 version = "0.1"
 release = "0.1.0"
 

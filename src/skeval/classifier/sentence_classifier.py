@@ -5,7 +5,7 @@ from typing import List
 import torch
 import torch.nn as nn
 
-from sentinel.utils.helpers import LabelEncoder, VocabBuilder
+from skeval.utils.helpers import LabelEncoder, VocabBuilder
 
 
 class BasicTextClassifier(nn.Module):
@@ -59,7 +59,7 @@ class SentenceClassifier:
             num_classes=self.label_encoder.num_classes,
         ).to(self.device)
 
-        from sentinel.dataset.loader import DatasetLoader
+        from skeval.dataset.loader import DatasetLoader
 
         dataloader = DatasetLoader.create_dataloader(
             sentences, labels, self.vocab, self.label_encoder, batch_size=batch_size
