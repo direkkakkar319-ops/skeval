@@ -4,7 +4,7 @@ from skeval.metrics.metrics import compute_metrics
 
 
 class Evaluator:
-    """Evaluates the predictions of a Sentinel AI classifier against ground truth."""
+    """Evaluates the predictions of a skeval classifier against ground truth."""
 
     def __init__(self):
         pass

@@ -31,7 +31,7 @@ class BasicTextClassifier(nn.Module):
 
 
 class SentenceClassifier:
-    """High-level Sentinel API to train and predict semantic sentence categories."""
+    """High-level skeval to train and predict semantic sentence categories."""
 
     def __init__(self, embed_dim: int = 64):
         self.embed_dim = embed_dim
@@ -170,6 +170,10 @@ class SentenceClassifier:
             num_classes=self.label_encoder.num_classes,
         ).to(self.device)
         self.model.load_state_dict(
-            torch.load(os.path.join(save_dir, "model.pt"), map_location=self.device)
+            torch.load(
+                os.path.join(save_dir, "model.pt"),
+                map_location=self.device,
+                weights_only=True,
+            )
         )
         self.model.eval()
