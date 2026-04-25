@@ -18,7 +18,7 @@ from sentinel.classifier import SentenceClassifier
 from sentinel.evaluator import Evaluator
 from sentinel.metrics import compute_metrics
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __author__ = "Sentinel AI Contributors"
 __license__ = "MIT"
 
