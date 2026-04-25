@@ -54,3 +54,13 @@ sentinel.utils
    :members:
    :undoc-members:
    :show-inheritance:
+
+----
+
+sentinel.cli
+------------
+
+.. automodule:: sentinel.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:

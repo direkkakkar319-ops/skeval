@@ -134,10 +134,96 @@ Use :class:`~sentinel.dataset.loader.DatasetLoader` to read CSV or JSON Lines fi
 
 ----
 
-Command-Line Scripts
---------------------
+Command-Line Interface
+----------------------
 
-Sentinel AI ships two ready-to-use CLI scripts in ``scripts/``.
+After installing the package, a ``sentinel`` command is available:
+
+.. code-block:: bash
+
+   sentinel --help
+   sentinel train --help
+   sentinel evaluate --help
+
+Check the installed version:
+
+.. code-block:: bash
+
+   sentinel --version
+
+Training via CLI
+^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+   sentinel train \
+       --data data/train.csv \
+       --text-col text \
+       --label-col label \
+       --save-dir saved_model/ \
+       --epochs 20 \
+       --batch-size 32 \
+       --embed-dim 64 \
+       --lr 0.005
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Argument
+     - Description
+   * - ``--data``
+     - Path to ``.csv`` or ``.jsonl`` training file (required)
+   * - ``--text-col``
+     - Column / key name that holds the sentence text (required)
+   * - ``--label-col``
+     - Column / key name that holds the label (required)
+   * - ``--save-dir``
+     - Directory to write ``model.pt`` and ``metadata.json`` (required)
+   * - ``--embed-dim``
+     - Embedding dimension (default: ``64``)
+   * - ``--epochs``
+     - Number of training epochs (default: ``10``)
+   * - ``--batch-size``
+     - Mini-batch size (default: ``32``)
+   * - ``--lr``
+     - Learning rate (default: ``0.005``)
+
+Evaluation via CLI
+^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+   sentinel evaluate \
+       --model-dir saved_model/ \
+       --data data/test.csv \
+       --text-col text \
+       --label-col label \
+       --output report.json
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Argument
+     - Description
+   * - ``--model-dir``
+     - Directory containing ``model.pt`` and ``metadata.json`` (required)
+   * - ``--data``
+     - Path to test ``.csv`` or ``.jsonl`` file (required)
+   * - ``--text-col``
+     - Column / key name for the sentence text (required)
+   * - ``--label-col``
+     - Column / key name for the ground-truth label (required)
+   * - ``--output``
+     - Optional path to save the JSON results file
+
+----
+
+Legacy Scripts
+--------------
+
+Sentinel AI also ships standalone scripts in ``scripts/`` that work without installation.
 
 Training
 ^^^^^^^^
