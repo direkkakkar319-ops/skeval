@@ -10,7 +10,7 @@ Module Overview
 
 .. code-block:: text
 
-   sentinel/
+   skeval/
    ├── classifier/          # Training and inference
    │   └── sentence_classifier.py
    ├── dataset/             # Data loading and batching

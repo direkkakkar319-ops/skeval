@@ -25,7 +25,7 @@ Install the package:
 
 .. code-block:: bash
 
-   pip install sentinel-ai
+   pip install skeval
 
 Train a classifier and evaluate it in a few lines:
 
