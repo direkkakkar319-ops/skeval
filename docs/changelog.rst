@@ -8,6 +8,18 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 ----
 
+0.1.1 — 2026-04-25
+-------------------
+
+**Fixed**
+
+* CI workflow: updated ``actions/checkout`` to ``v4`` and ``actions/setup-python`` to ``v5`` (``v6`` does not exist and caused CI failures)
+* README: corrected ``predict()`` usage example — method takes a list of strings, not a single string
+* README: corrected example output keys (``per_class_f1`` → ``per_class``)
+* README: fixed install URL placeholder (``your-username`` → correct repo path)
+
+----
+
 0.1.0 — 2026-04-25
 -------------------
 

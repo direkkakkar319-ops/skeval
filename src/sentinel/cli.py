@@ -81,7 +81,7 @@ def main():
         prog="sentinel",
         description="Sentinel AI — Semantic Evaluation Layer for LLMs",
     )
-    parser.add_argument("--version", action="version", version="sentinel-ai 0.1.0")
+    parser.add_argument("--version", action="version", version="sentinel-ai 0.1.1")
     subparsers = parser.add_subparsers(dest="command", metavar="<command>")
     subparsers.required = True
 
