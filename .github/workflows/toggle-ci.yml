@@ -1,0 +1,23 @@
+name: Toggle Auto CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      enable:
+        description: 'Enable automatic CI on every commit?'
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  toggle:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Set ENABLE_AUTO_CI variable
+        run: |
+          gh variable set ENABLE_AUTO_CI --body "${{ inputs.enable }}" --repo ${{ github.repository }}
+          echo "Auto CI is now set to: ${{ inputs.enable }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
