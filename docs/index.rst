@@ -1,42 +1,66 @@
-Welcome to Sentinel AI!
-=======================
+Welcome to Sentinel AI
+======================
 
-Sentinel AI is a robust PyTorch-powered library for classifying and evaluating semantic concepts in text. It allows you to build custom deep learning models from the ground up to detect facts, emotions, opinions, instructions, and more.
+**Sentinel AI** is a lightweight PyTorch-powered library for classifying and evaluating the *semantic type* of sentences — facts, emotions, opinions, and instructions.
+
+It fills the gap that standard LLM benchmarks leave open: not *how fluent* the output is, but *what kind of language* it uses.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contents
 
+   installation
    usage
+   architecture
    api
+   changelog
+   contributing
 
-Installation
-------------
-
-You can install Sentinel AI directly using pip:
-
-.. code-block:: bash
-
-   git clone https://github.com/direkkakkar319-ops/Sentinel.AI.git
-   cd Sentinel.AI
-   pip install -e .
+----
 
 Quickstart
 ----------
 
-You can quickly train a model right from the python API:
+Install the package:
+
+.. code-block:: bash
+
+   pip install sentinel-ai
+
+Train a classifier and evaluate it in a few lines:
 
 .. code-block:: python
 
    from sentinel.classifier import SentenceClassifier
+   from sentinel.evaluator import Evaluator
 
-   sentences = ["Water boils at 100C", "I feel happy"]
-   labels = ["fact", "emotion"]
+   classifier = SentenceClassifier(embed_dim=64)
 
-   classifier = SentenceClassifier()
-   classifier.train(sentences, labels, epochs=10)
+   sentences = [
+       "Water boils at 100 degrees Celsius",
+       "I feel happy today",
+       "I think pizza is the best food",
+       "Please close the door",
+   ]
+   labels = ["fact", "emotion", "opinion", "instruction"]
 
-   predictions = classifier.predict(["The sky is blue"])
-   print(predictions)
+   classifier.train(sentences, labels, epochs=20)
 
-See the :doc:`usage` section for information on the command line interface.
+   predictions = classifier.predict(["The sky is blue", "I am sad"])
+   print(predictions)  # e.g. ['fact', 'emotion']
+
+   evaluator = Evaluator()
+   results = evaluator.evaluate(predictions, ["fact", "emotion"])
+   print(results["accuracy"])
+
+----
+
+Key Features
+------------
+
+* **Four semantic categories** out of the box: ``fact``, ``emotion``, ``opinion``, ``instruction``
+* **Custom labels** — bring any label taxonomy you need
+* **Save / load** trained models to disk
+* **Evaluation metrics** — accuracy, per-class precision / recall / F1, confusion matrix
+* **Dataset utilities** — load from CSV or JSON Lines files
+* **Training scripts** — CLI scripts for training and evaluation without writing Python
