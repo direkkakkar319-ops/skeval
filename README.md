@@ -1,8 +1,8 @@
-# Sentinel AI
+# skeval
 
 **Semantic Evaluation Layer for LLMs**
 
-Sentinel AI is a lightweight library designed to evaluate how well Large Language Models (LLMs) understand and generate different types of sentences—such as facts, emotions, opinions, and instructions.
+skeval is a lightweight library designed to evaluate how well Large Language Models (LLMs) understand and generate different types of sentences—such as facts, emotions, opinions, and instructions.
 
 ---
 
@@ -20,7 +20,7 @@ But real-world language understanding also requires:
 * Detecting emotions
 * Identifying intent and instruction
 
-Sentinel AI fills this gap by providing a **semantic classification and evaluation layer**.
+skeval fills this gap by providing a **semantic classification and evaluation layer**.
 
 ---
 
@@ -61,9 +61,9 @@ Sentinel AI fills this gap by providing a **semantic classification and evaluati
 ## 🏗️ Project Structure
 
 ```
-sentinel-ai/
+skeval/
 │
-├── src/sentinel/
+├── src/skeval/
 │   ├── classifier/
 │   ├── evaluator/
 │   ├── metrics/
@@ -94,8 +94,8 @@ pip install -e .
 ## 🧪 Example Usage
 
 ```python
-from sentinel.classifier import SentenceClassifier
-from sentinel.evaluator import Evaluator
+from skeval.classifier import SentenceClassifier
+from skeval.evaluator import Evaluator
 
 sentences = [
     "Water boils at 100 degrees Celsius",

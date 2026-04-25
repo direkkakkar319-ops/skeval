@@ -19,9 +19,9 @@ import tempfile
 
 import pandas as pd
 
-from sentinel.classifier import SentenceClassifier
-from sentinel.dataset.loader import DatasetLoader
-from sentinel.evaluator import Evaluator
+from skeval.classifier import SentenceClassifier
+from skeval.dataset.loader import DatasetLoader
+from skeval.evaluator import Evaluator
 
 # --- Build temporary sample files ---
 

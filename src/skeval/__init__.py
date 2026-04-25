@@ -1,12 +1,12 @@
-"""Sentinel AI — Semantic Evaluation Layer for LLMs.
+"""skeval — Semantic Evaluation Layer for LLMs.
 
 This package provides tools to classify and evaluate LLM outputs based on
 semantic sentence types: facts, emotions, opinions, and instructions.
 
 Example
 -------
-    >>> from sentinel.classifier import SentenceClassifier
-    >>> from sentinel.evaluator import Evaluator
+    >>> from skeval.classifier import SentenceClassifier
+    >>> from skeval.evaluator import Evaluator
     >>> classifier = SentenceClassifier()
     >>> evaluator = Evaluator()
     >>> predictions = [classifier.predict(s) for s in ["Water boils at 100°C"]]
@@ -14,12 +14,12 @@ Example
     >>> print(results)
 """
 
-from sentinel.classifier import SentenceClassifier
-from sentinel.evaluator import Evaluator
-from sentinel.metrics import compute_metrics
+from skeval.classifier import SentenceClassifier
+from skeval.evaluator import Evaluator
+from skeval.metrics import compute_metrics
 
 __version__ = "0.1.1"
-__author__ = "Sentinel AI Contributors"
+__author__ = "skeval Contributors"
 __license__ = "MIT"
 
 __all__ = [

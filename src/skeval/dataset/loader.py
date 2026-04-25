@@ -5,7 +5,7 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader, Dataset
 
-from sentinel.utils.helpers import LabelEncoder, VocabBuilder
+from skeval.utils.helpers import LabelEncoder, VocabBuilder
 
 
 class SentenceDataset(Dataset):

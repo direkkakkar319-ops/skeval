@@ -2,8 +2,8 @@ import json
 
 import pandas as pd
 
-from sentinel.dataset.loader import DatasetLoader
-from sentinel.utils.helpers import LabelEncoder, VocabBuilder
+from skeval.dataset.loader import DatasetLoader
+from skeval.utils.helpers import LabelEncoder, VocabBuilder
 
 
 def test_vocab_builder():

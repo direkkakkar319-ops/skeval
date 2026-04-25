@@ -7,60 +7,60 @@ API Reference
 
 ----
 
-sentinel.classifier
+skeval.classifier
 -------------------
 
-.. automodule:: sentinel.classifier.sentence_classifier
+.. automodule:: skeval.classifier.sentence_classifier
    :members:
    :undoc-members:
    :show-inheritance:
 
 ----
 
-sentinel.evaluator
+skeval.evaluator
 ------------------
 
-.. automodule:: sentinel.evaluator.evaluator
+.. automodule:: skeval.evaluator.evaluator
    :members:
    :undoc-members:
    :show-inheritance:
 
 ----
 
-sentinel.metrics
+skeval.metrics
 ----------------
 
-.. automodule:: sentinel.metrics.metrics
+.. automodule:: skeval.metrics.metrics
    :members:
    :undoc-members:
    :show-inheritance:
 
 ----
 
-sentinel.dataset
+skeval.dataset
 ----------------
 
-.. automodule:: sentinel.dataset.loader
+.. automodule:: skeval.dataset.loader
    :members:
    :undoc-members:
    :show-inheritance:
 
 ----
 
-sentinel.utils
+skeval.utils
 --------------
 
-.. automodule:: sentinel.utils.helpers
+.. automodule:: skeval.utils.helpers
    :members:
    :undoc-members:
    :show-inheritance:
 
 ----
 
-sentinel.cli
+skeval.cli
 ------------
 
-.. automodule:: sentinel.cli
+.. automodule:: skeval.cli
    :members:
    :undoc-members:
    :show-inheritance:

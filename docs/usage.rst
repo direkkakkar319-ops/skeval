@@ -7,11 +7,11 @@ Python API
 Training a Classifier
 ^^^^^^^^^^^^^^^^^^^^^
 
-Create a :class:`~sentinel.classifier.SentenceClassifier`, pass your sentences and labels, and call :meth:`~sentinel.classifier.SentenceClassifier.train`:
+Create a :class:`~skeval.classifier.SentenceClassifier`, pass your sentences and labels, and call :meth:`~skeval.classifier.SentenceClassifier.train`:
 
 .. code-block:: python
 
-   from sentinel.classifier import SentenceClassifier
+   from skeval.classifier import SentenceClassifier
 
    classifier = SentenceClassifier(embed_dim=64)
 
@@ -39,7 +39,7 @@ The label vocabulary is inferred automatically from the labels you provide — y
 Making Predictions
 ^^^^^^^^^^^^^^^^^^
 
-:meth:`~sentinel.classifier.SentenceClassifier.predict` takes a list of strings and returns a list of predicted label strings:
+:meth:`~skeval.classifier.SentenceClassifier.predict` takes a list of strings and returns a list of predicted label strings:
 
 .. code-block:: python
 
@@ -65,7 +65,7 @@ Load it back in a new session:
 
 .. code-block:: python
 
-   from sentinel.classifier import SentenceClassifier
+   from skeval.classifier import SentenceClassifier
 
    classifier = SentenceClassifier()
    classifier.load("saved_model/")
@@ -77,11 +77,11 @@ Two files are written: ``model.pt`` (PyTorch weights) and ``metadata.json`` (voc
 Evaluating Predictions
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Pass predictions and ground-truth labels to :class:`~sentinel.evaluator.Evaluator`:
+Pass predictions and ground-truth labels to :class:`~skeval.evaluator.Evaluator`:
 
 .. code-block:: python
 
-   from sentinel.evaluator import Evaluator
+   from skeval.evaluator import Evaluator
 
    evaluator = Evaluator()
    results = evaluator.evaluate(predictions, ground_truth)
@@ -114,11 +114,11 @@ The returned dictionary contains:
 Loading Data from Files
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Use :class:`~sentinel.dataset.loader.DatasetLoader` to read CSV or JSON Lines files:
+Use :class:`~skeval.dataset.loader.DatasetLoader` to read CSV or JSON Lines files:
 
 .. code-block:: python
 
-   from sentinel.dataset.loader import DatasetLoader
+   from skeval.dataset.loader import DatasetLoader
 
    # CSV
    sentences, labels = DatasetLoader.load_csv(
@@ -137,26 +137,26 @@ Use :class:`~sentinel.dataset.loader.DatasetLoader` to read CSV or JSON Lines fi
 Command-Line Interface
 ----------------------
 
-After installing the package, a ``sentinel`` command is available:
+After installing the package, a ``skeval`` command is available:
 
 .. code-block:: bash
 
-   sentinel --help
-   sentinel train --help
-   sentinel evaluate --help
+   skeval --help
+   skeval train --help
+   skeval evaluate --help
 
 Check the installed version:
 
 .. code-block:: bash
 
-   sentinel --version
+   skeval --version
 
 Training via CLI
 ^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
-   sentinel train \
+   skeval train \
        --data data/train.csv \
        --text-col text \
        --label-col label \
@@ -194,7 +194,7 @@ Evaluation via CLI
 
 .. code-block:: bash
 
-   sentinel evaluate \
+   skeval evaluate \
        --model-dir saved_model/ \
        --data data/test.csv \
        --text-col text \
@@ -223,7 +223,7 @@ Evaluation via CLI
 Legacy Scripts
 --------------
 
-Sentinel AI also ships standalone scripts in ``scripts/`` that work without installation.
+skeval also ships standalone scripts in ``scripts/`` that work without installation.
 
 Training
 ^^^^^^^^

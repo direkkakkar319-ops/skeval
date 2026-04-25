@@ -4,7 +4,7 @@ Note: with only 8 training sentences the model may not generalize perfectly
 to unseen phrasing. See 03_evaluation.py for a more robust example.
 """
 
-from sentinel.classifier import SentenceClassifier
+from skeval.classifier import SentenceClassifier
 
 sentences = [
     "Water boils at 100 degrees Celsius",

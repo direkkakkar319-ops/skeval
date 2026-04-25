@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from sentinel.metrics.metrics import compute_metrics
+from skeval.metrics.metrics import compute_metrics
 
 
 class Evaluator:
