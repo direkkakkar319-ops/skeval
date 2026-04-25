@@ -23,10 +23,18 @@ sentences = [
     "I demand to speak to a manager",
 ]
 labels = [
-    "shipping_issue", "shipping_issue", "shipping_issue",
-    "account_help", "account_help", "account_help",
-    "positive_feedback", "positive_feedback", "positive_feedback",
-    "complaint", "complaint", "complaint",
+    "shipping_issue",
+    "shipping_issue",
+    "shipping_issue",
+    "account_help",
+    "account_help",
+    "account_help",
+    "positive_feedback",
+    "positive_feedback",
+    "positive_feedback",
+    "complaint",
+    "complaint",
+    "complaint",
 ]
 
 classifier = SentenceClassifier(embed_dim=32)
