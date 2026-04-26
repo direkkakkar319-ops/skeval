@@ -4,6 +4,7 @@ from typing import List
 
 import torch
 import torch.nn as nn
+from tqdm import tqdm
 
 from skeval.utils.helpers import LabelEncoder, VocabBuilder
 
@@ -49,7 +50,7 @@ class SentenceClassifier:
         lr: float = 0.005,
     ):
         """Train the classifier from the core."""
-        print(f"Building vocab and label encoder on {len(sentences)} sentences...")
+        tqdm.write(f"Building vocab on {len(sentences)} sentences...")
         self.vocab.build(sentences)
         self.label_encoder.build(labels)
 
@@ -69,7 +70,7 @@ class SentenceClassifier:
         optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
 
         print(f"Training on device: {self.device}")
-        for epoch in range(1, epochs + 1):
+        for epoch in tqdm(range(1, epochs + 1), desc="Training", unit="epoch"):
             self.model.train()
             total_loss = 0.0
             total_acc = 0
@@ -90,7 +91,7 @@ class SentenceClassifier:
                 total_loss += loss.item()
                 total_acc += (output.argmax(1) == targets).sum().item()
 
-            print(
+            tqdm.write(
                 f"Epoch {epoch}/{epochs} | "
                 f"Loss: {total_loss / len(dataloader):.4f} | "
                 f"Acc: {total_acc / len(sentences):.4f}"
