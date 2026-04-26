@@ -1,7 +1,9 @@
 import json
 import os
-from typing import List
+import random
+from typing import List, Optional
 
+import numpy as np
 import torch
 import torch.nn as nn
 from tqdm import tqdm
@@ -34,12 +36,19 @@ class BasicTextClassifier(nn.Module):
 class SentenceClassifier:
     """High-level skeval to train and predict semantic sentence categories."""
 
-    def __init__(self, embed_dim: int = 64):
+    def __init__(self, embed_dim: int = 64, random_state: Optional[int] = None):
         self.embed_dim = embed_dim
+        self.random_state = random_state
         self.model = None
         self.vocab = VocabBuilder()
         self.label_encoder = LabelEncoder()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    def _seed(self):
+        if self.random_state is not None:
+            random.seed(self.random_state)
+            np.random.seed(self.random_state)
+            torch.manual_seed(self.random_state)
 
     def train(
         self,
@@ -50,6 +59,7 @@ class SentenceClassifier:
         lr: float = 0.005,
     ):
         """Train the classifier from the core."""
+        self._seed()
         tqdm.write(f"Building vocab on {len(sentences)} sentences...")
         self.vocab.build(sentences)
         self.label_encoder.build(labels)
@@ -69,7 +79,7 @@ class SentenceClassifier:
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
 
-        print(f"Training on device: {self.device}")
+        tqdm.write(f"Training on device: {self.device}")
         for epoch in tqdm(range(1, epochs + 1), desc="Training", unit="epoch"):
             self.model.train()
             total_loss = 0.0
@@ -109,9 +119,7 @@ class SentenceClassifier:
             for sentence in sentences:
                 encoded = torch.tensor(self.vocab.encode(sentence), dtype=torch.long)
                 if len(encoded) == 0:
-                    encoded = torch.tensor(
-                        [0], dtype=torch.long
-                    )  # Handle empty/unknown sentences
+                    encoded = torch.tensor([0], dtype=torch.long)
 
                 text = encoded.to(self.device)
                 offset = torch.tensor([0], dtype=torch.long).to(self.device)
