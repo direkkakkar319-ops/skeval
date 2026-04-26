@@ -9,6 +9,22 @@ from tqdm import tqdm
 from skeval.utils.helpers import LabelEncoder, VocabBuilder
 
 
+def _validate_input(X, y=None):
+    if not isinstance(X, (list, tuple)) or len(X) == 0:
+        raise ValueError("X must be a non-empty list of strings.")
+    if not all(isinstance(s, str) for s in X):
+        raise ValueError("All elements of X must be strings.")
+    if y is not None:
+        if not isinstance(y, (list, tuple)) or len(y) == 0:
+            raise ValueError("y must be a non-empty list of strings.")
+        if not all(isinstance(s, str) for s in y):
+            raise ValueError("All elements of y must be strings.")
+        if len(X) != len(y):
+            raise ValueError(
+                f"X and y must have the same length, got {len(X)} and {len(y)}."
+            )
+
+
 class BasicTextClassifier(nn.Module):
     """A fundamental PyTorch deep learning architecture for text classification.
     Uses an EmbeddingBag to average word vectors, followed by a Linear layer.
@@ -50,6 +66,7 @@ class SentenceClassifier:
         lr: float = 0.005,
     ):
         """Train the classifier from the core."""
+        _validate_input(sentences, labels)
         tqdm.write(f"Building vocab on {len(sentences)} sentences...")
         self.vocab.build(sentences)
         self.label_encoder.build(labels)
@@ -101,6 +118,7 @@ class SentenceClassifier:
         """Predict labels for a list of sentences."""
         if self.model is None:
             raise RuntimeError("Model is not trained. Call train() or load() first.")
+        _validate_input(sentences)
 
         self.model.eval()
         predictions = []
