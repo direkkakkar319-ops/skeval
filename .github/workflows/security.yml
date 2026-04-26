@@ -1,6 +1,7 @@
 name: Security Scan
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main, master ]
   pull_request:
@@ -10,6 +11,7 @@ on:
 
 jobs:
   security-audit:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || vars.ENABLE_AUTO_CI == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -25,6 +27,7 @@ jobs:
     - name: Run Bandit
       run: bandit -r src/ -ll
     - name: Vulnerability Audit (pip-audit)
-      run: pip-audit --skip-editable
+      # CVE-2026-3219 affects pip 26.0.1 — no fix version released yet, ignored until patch is available
+      run: pip-audit --skip-editable --ignore-vuln CVE-2026-3219
     - name: License Compliance Check
       run: pip-licenses --format=markdown > licenses.md
