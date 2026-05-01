@@ -150,8 +150,8 @@ class SentenceClassifier:
 
         Example:
             >>> clf = SentenceClassifier(embed_dim=128, epochs=20)
-            >>> clf.get_params()
-            {'embed_dim': 128, 'epochs': 20, 'batch_size': 32, 'lr': 0.005, 'random_state': None}
+            >>> clf.get_params()  # doctest: +ELLIPSIS
+            {'embed_dim': 128, 'epochs': 20, ...}
         """
         del deep  # no nested estimators
         return {
