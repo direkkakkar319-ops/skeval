@@ -13,8 +13,8 @@ Getting Started
 
    .. code-block:: bash
 
-      git clone https://github.com/<your-username>/Sentinel.AI.git
-      cd Sentinel.AI
+      git clone https://github.com/<your-username>/skeval.git
+      cd skeval
       git checkout -b my-feature
 
 3. Install the package in editable mode with dev dependencies:
@@ -42,7 +42,7 @@ For a coverage report:
 
 .. code-block:: bash
 
-   pytest --cov=sentinel --cov-report=term-missing
+   pytest --cov=src/skeval --cov-report=term-missing
 
 All tests must pass before a pull request can be merged.
 
@@ -75,10 +75,9 @@ Building the Docs Locally
 .. code-block:: bash
 
    pip install -e ".[docs]"
-   cd docs
-   make html
+   sphinx-build -b html docs/ docs/build/
 
-The built site is written to ``docs/_build/html/``. Open ``index.html`` in a browser to preview.
+The built site is written to ``docs/build/``. Open ``index.html`` in a browser to preview.
 
 ----
 
@@ -87,8 +86,9 @@ Submitting a Pull Request
 
 * Keep pull requests focused — one feature or fix per PR.
 * Add tests for any new behaviour.
-* Update ``docs/changelog.rst`` with a brief entry under a new version heading if applicable.
-* Make sure ``pytest``, ``black --check``, and ``mypy`` all pass locally before pushing.
+* Update ``CHANGELOG.md`` with a brief entry under the ``[Unreleased]`` heading.
+* Make sure ``pytest``, ``black --check``, and ``flake8`` all pass locally before pushing.
+* A maintainer will comment ``/run-ci`` on your PR to trigger the CI checks.
 
 If you are unsure whether your change fits the project direction, open an issue first to discuss it.
 
