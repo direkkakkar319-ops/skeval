@@ -1,13 +1,31 @@
 import json
 import os
+import random
 import warnings
 from typing import Any, Dict, List, Optional
 
+import numpy as np
 import torch
 import torch.nn as nn
 from tqdm import tqdm
 
 from skeval.utils.helpers import LabelEncoder, VocabBuilder
+
+
+def _validate_input(X, y=None):
+    if not isinstance(X, (list, tuple)) or len(X) == 0:
+        raise ValueError("X must be a non-empty list of strings.")
+    if not all(isinstance(s, str) for s in X):
+        raise ValueError("All elements of X must be strings.")
+    if y is not None:
+        if not isinstance(y, (list, tuple)) or len(y) == 0:
+            raise ValueError("y must be a non-empty list of strings.")
+        if not all(isinstance(s, str) for s in y):
+            raise ValueError("All elements of y must be strings.")
+        if len(X) != len(y):
+            raise ValueError(
+                f"X and y must have the same length, got {len(X)} and {len(y)}."
+            )
 
 
 class BasicTextClassifier(nn.Module):
@@ -78,9 +96,11 @@ class SentenceClassifier:
             update. Larger batches are faster but need more memory. Default: 32.
         lr: Learning rate for the Adam optimiser. Controls how large each
             weight update step is. Default: 0.005.
+        random_state: Seed for ``random``, ``numpy``, and ``torch`` to make
+            training reproducible on CPU. Default: None (non-deterministic).
 
     Example:
-        >>> clf = SentenceClassifier(embed_dim=64, epochs=10)
+        >>> clf = SentenceClassifier(embed_dim=64, epochs=10, random_state=42)
         >>> clf.fit(["The sky is blue", "I feel sad"], ["fact", "emotion"])
         >>> clf.predict(["Water boils at 100C"])
         ['fact']
@@ -94,15 +114,23 @@ class SentenceClassifier:
         epochs: int = 5,
         batch_size: int = 32,
         lr: float = 0.005,
+        random_state: Optional[int] = None,
     ):
         self.embed_dim = embed_dim
         self.epochs = epochs
         self.batch_size = batch_size
         self.lr = lr
+        self.random_state = random_state
         self.model = None
         self.vocab = VocabBuilder()
         self.label_encoder = LabelEncoder()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    def _seed(self):
+        if self.random_state is not None:
+            random.seed(self.random_state)
+            np.random.seed(self.random_state)
+            torch.manual_seed(self.random_state)
 
     # ------------------------------------------------------------------
     # sklearn estimator interface
@@ -123,7 +151,7 @@ class SentenceClassifier:
         Example:
             >>> clf = SentenceClassifier(embed_dim=128, epochs=20)
             >>> clf.get_params()
-            {'embed_dim': 128, 'epochs': 20, 'batch_size': 32, 'lr': 0.005}
+            {'embed_dim': 128, 'epochs': 20, 'batch_size': 32, 'lr': 0.005, 'random_state': None}
         """
         del deep  # no nested estimators
         return {
@@ -131,6 +159,7 @@ class SentenceClassifier:
             "epochs": self.epochs,
             "batch_size": self.batch_size,
             "lr": self.lr,
+            "random_state": self.random_state,
         }
 
     def set_params(self, **params) -> "SentenceClassifier":
@@ -187,6 +216,8 @@ class SentenceClassifier:
             ...     ["fact", "emotion"],
             ... )
         """
+        _validate_input(X, y)
+        self._seed()
         tqdm.write(f"Building vocab on {len(X)} sentences...")
         self.vocab.build(X)
         self.label_encoder.build(y)
@@ -259,6 +290,7 @@ class SentenceClassifier:
         """
         if self.model is None:
             raise RuntimeError("Model is not fitted. Call fit() or load() first.")
+        _validate_input(X)
 
         self.model.eval()
         predictions = []

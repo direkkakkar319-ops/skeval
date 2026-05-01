@@ -14,16 +14,25 @@ Install from PyPI
 
 .. code-block:: bash
 
-   pip install sentinel-ai
+   pip install skeval
 
 Install from Source
 -------------------
 
 .. code-block:: bash
 
-   git clone https://github.com/direkkakkar319-ops/Sentinel.AI.git
-   cd Sentinel.AI
+   git clone https://github.com/direkkakkar319-ops/skeval.git
+   cd skeval
    pip install -e .
+
+Install with Transformer Support
+---------------------------------
+
+Required for the future ``TransformerClassifier`` (v0.3.0+):
+
+.. code-block:: bash
+
+   pip install "skeval[transformers]"
 
 Install with Dev Extras
 -----------------------
@@ -48,5 +57,5 @@ Verify Installation
 
 .. code-block:: python
 
-   import sentinel
-   print(sentinel.__version__)  # 0.1.0
+   import skeval
+   print(skeval.__version__)  # 0.1.2
