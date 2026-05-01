@@ -84,8 +84,8 @@ skeval/
 ## ⚙️ Installation
 
 ```bash
-git clone https://github.com/direkkakkar319-ops/Sentinel.AI.git
-cd Sentinel.AI
+git clone github.com/direkkakkar319-ops/skeval
+cd skeval
 pip install -e .
 ```
 
