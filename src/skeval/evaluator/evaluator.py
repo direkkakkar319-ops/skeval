@@ -22,6 +22,10 @@ class Evaluator:
         Returns:
             A comprehensive dictionary of performance metrics.
         """
+        if not isinstance(predictions, (list, tuple)) or len(predictions) == 0:
+            raise ValueError("predictions must be a non-empty list of strings.")
+        if not isinstance(ground_truth, (list, tuple)) or len(ground_truth) == 0:
+            raise ValueError("ground_truth must be a non-empty list of strings.")
         if len(predictions) != len(ground_truth):
             raise ValueError(
                 f"Mismatch in lengths: "
