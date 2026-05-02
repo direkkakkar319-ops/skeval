@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader, Dataset
 from skeval.utils.helpers import LabelEncoder, VocabBuilder
 
 
-class SentenceDataset(Dataset):
+class SentenceDataset(Dataset):  # type: ignore[type-arg]
     """PyTorch Dataset for sentences."""
 
     def __init__(
@@ -17,29 +17,30 @@ class SentenceDataset(Dataset):
         labels: List[str],
         vocab: VocabBuilder,
         label_encoder: LabelEncoder,
-    ):
+    ) -> None:
         self.sentences = sentences
         self.labels = labels
         self.vocab = vocab
         self.label_encoder = label_encoder
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.sentences)
 
-    def __getitem__(self, idx) -> Tuple[torch.Tensor, torch.Tensor]:
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
         sentence = self.sentences[idx]
         label = self.labels[idx]
 
         encoded_sentence = self.vocab.encode(sentence)
         encoded_label = self.label_encoder.encode(label)
 
-        # Returning sentences and labels as tensors
         return torch.tensor(encoded_sentence, dtype=torch.long), torch.tensor(
             encoded_label, dtype=torch.long
         )
 
 
-def collate_fn(batch):
+def collate_fn(
+    batch: List[Tuple[torch.Tensor, torch.Tensor]],
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """Collate function to pad variable-length sentences in a batch."""
     labels = []
     sentences = []
@@ -50,11 +51,11 @@ def collate_fn(batch):
         sentences.append(text_tensor)
         offsets.append(text_tensor.size(0))
 
-    labels = torch.tensor(labels, dtype=torch.long)
-    offsets = torch.tensor(offsets[:-1]).cumsum(dim=0)
-    sentences = torch.cat(sentences)
+    labels_t = torch.tensor(labels, dtype=torch.long)
+    offsets_t = torch.tensor(offsets[:-1]).cumsum(dim=0)
+    sentences_t = torch.cat(sentences)
 
-    return sentences, labels, offsets
+    return sentences_t, labels_t, offsets_t
 
 
 class DatasetLoader:
@@ -73,8 +74,8 @@ class DatasetLoader:
         filepath: str, text_key: str, label_key: str
     ) -> Tuple[List[str], List[str]]:
         """Load sentences and labels from a JSON lines file."""
-        sentences = []
-        labels = []
+        sentences: List[str] = []
+        labels: List[str] = []
         with open(filepath, "r", encoding="utf-8") as f:
             for line in f:
                 data = json.loads(line)
@@ -90,7 +91,7 @@ class DatasetLoader:
         label_encoder: LabelEncoder,
         batch_size: int = 32,
         shuffle: bool = True,
-    ) -> DataLoader:
+    ) -> DataLoader:  # type: ignore[type-arg]
         """Create a PyTorch DataLoader from raw text and labels."""
         dataset = SentenceDataset(sentences, labels, vocab, label_encoder)
         return DataLoader(

@@ -13,16 +13,16 @@ def normalize_text(text: str) -> str:
 class VocabBuilder:
     """Builds a vocabulary from text corpus and encodes sentences into indices."""
 
-    def __init__(self, min_freq: int = 1):
+    def __init__(self, min_freq: int = 1) -> None:
         self.min_freq = min_freq
         # Reserve 0 for padding, 1 for unknown words
         self.word2idx: Dict[str, int] = {"<PAD>": 0, "<UNK>": 1}
         self.idx2word: Dict[int, str] = {0: "<PAD>", 1: "<UNK>"}
-        self.is_built = False
+        self.is_built: bool = False
 
-    def build(self, sentences: List[str]):
+    def build(self, sentences: List[str]) -> None:
         """Build vocabulary from a list of sentences."""
-        counter = Counter()
+        counter: Counter[str] = Counter()
         for sentence in sentences:
             words = normalize_text(sentence).split()
             counter.update(words)
@@ -42,21 +42,21 @@ class VocabBuilder:
         words = normalize_text(sentence).split()
         return [self.word2idx.get(word, self.word2idx["<UNK>"]) for word in words]
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.word2idx)
 
 
 class LabelEncoder:
     """Encodes string labels to integers and vice-versa."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.label2idx: Dict[str, int] = {}
         self.idx2label: Dict[int, str] = {}
-        self.is_built = False
+        self.is_built: bool = False
 
-    def build(self, labels: List[str]):
+    def build(self, labels: List[str]) -> None:
         """Build label encoding from a list of labels."""
-        unique_labels = sorted(list(set(labels)))
+        unique_labels = sorted(set(labels))
         for idx, label in enumerate(unique_labels):
             self.label2idx[label] = idx
             self.idx2label[idx] = label
