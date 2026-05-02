@@ -22,17 +22,17 @@ class VocabBuilder:
 
     def build(self, sentences: List[str]):
         """Build vocabulary from a list of sentences."""
-        counter = Counter()
-        for sentence in sentences:
-            words = normalize_text(sentence).split()
-            counter.update(words)
-
-        idx = 2
-        for word, count in counter.items():
-            if count >= self.min_freq:
-                self.word2idx[word] = idx
-                self.idx2word[idx] = word
-                idx += 1
+        counter = Counter(
+            word
+            for sentence in sentences
+            for word in normalize_text(sentence).split()
+        )
+        for idx, word in enumerate(
+            (w for w, c in counter.items() if c >= self.min_freq),
+            start=len(self.word2idx),
+        ):
+            self.word2idx[word] = idx
+            self.idx2word[idx] = word
         self.is_built = True
 
     def encode(self, sentence: str) -> List[int]:
