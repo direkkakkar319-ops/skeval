@@ -23,9 +23,7 @@ class VocabBuilder:
     def build(self, sentences: List[str]):
         """Build vocabulary from a list of sentences."""
         counter = Counter(
-            word
-            for sentence in sentences
-            for word in normalize_text(sentence).split()
+            word for sentence in sentences for word in normalize_text(sentence).split()
         )
         for idx, word in enumerate(
             (w for w, c in counter.items() if c >= self.min_freq),
