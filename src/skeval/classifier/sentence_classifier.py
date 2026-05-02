@@ -158,6 +158,25 @@ class SentenceClassifier:
                 out.append(self.label_encoder.decode(logits.argmax(1).item()))
         return out
 
+    def predict_proba(self, X: List[str]) -> np.ndarray:
+        """Return class probabilities for each sample, shape (n_samples, n_classes)."""
+        if self.model is None:
+            raise RuntimeError("Model is not fitted. Call fit() or load() first.")
+        _validate_input(X)
+
+        self.model.eval()
+        probs = []
+        with torch.no_grad():
+            for s in X:
+                ids = self.vocab.encode(s)
+                if not ids:
+                    ids = [0]
+                text = torch.tensor(ids, dtype=torch.long, device=self.device)
+                offset = torch.zeros(1, dtype=torch.long, device=self.device)
+                logits = self.model(text, offset)
+                probs.append(torch.softmax(logits, dim=1).cpu().numpy()[0])
+        return np.array(probs)
+
     def score(self, X: List[str], y: List[str]) -> float:
         preds = self.predict(X)
         return sum(p == t for p, t in zip(preds, y)) / len(y)
