@@ -13,6 +13,17 @@ from skeval.utils.helpers import LabelEncoder, VocabBuilder
 
 
 def _validate_input(X, y=None):
+    """Raise ``ValueError`` if ``X`` or ``y`` are malformed.
+
+    Args:
+        X: Candidate input sentences.
+        y: Candidate labels aligned with ``X``. Pass ``None`` to skip label
+            validation (e.g. when calling ``predict``).
+
+    Raises:
+        ValueError: If ``X`` or ``y`` are empty, contain non-strings, or have
+            mismatched lengths.
+    """
     if not isinstance(X, (list, tuple)) or len(X) == 0:
         raise ValueError("X must be a non-empty list of strings.")
     if not all(isinstance(s, str) for s in X):
@@ -29,26 +40,75 @@ def _validate_input(X, y=None):
 
 
 class BasicTextClassifier(nn.Module):
-    """EmbeddingBag + Linear text classifier."""
+    """EmbeddingBag + Linear text classifier.
+
+    A lightweight bag-of-words model: token indices are averaged by
+    ``EmbeddingBag`` and then projected to class logits by a single linear
+    layer.
+
+    Attributes:
+        embedding: ``nn.EmbeddingBag`` that averages token embeddings.
+        fc: Linear layer that projects the averaged embedding to class logits.
+    """
 
     def __init__(self, vocab_size: int, embed_dim: int, num_classes: int):
+        """Build the embedding and linear layers and initialise weights.
+
+        Args:
+            vocab_size: Total number of tokens in the vocabulary (including
+                ``<PAD>`` and ``<UNK>``).
+            embed_dim: Dimensionality of each token embedding.
+            num_classes: Number of output classes.
+        """
         super().__init__()
         self.embedding = nn.EmbeddingBag(vocab_size, embed_dim, sparse=False)
         self.fc = nn.Linear(embed_dim, num_classes)
         self.init_weights()
 
     def init_weights(self):
+        """Initialise embedding and linear weights with a uniform distribution.
+
+        Weights are drawn from ``Uniform(-0.5, 0.5)`` and biases are set to
+        zero. This gives a balanced starting point that avoids saturation.
+        """
         r = 0.5
         self.embedding.weight.data.uniform_(-r, r)
         self.fc.weight.data.uniform_(-r, r)
         self.fc.bias.data.zero_()
 
     def forward(self, text, offsets):
+        """Compute class logits for a batch of sentences.
+
+        Args:
+            text: Flat 1-D ``LongTensor`` of concatenated token indices.
+            offsets: 1-D ``LongTensor`` of sentence start positions within
+                ``text``, as produced by ``collate_fn``.
+
+        Returns:
+            ``FloatTensor`` of shape ``(batch_size, num_classes)`` containing
+            raw (pre-softmax) class scores.
+        """
         return self.fc(self.embedding(text, offsets))
 
 
 class SentenceClassifier:
-    """sklearn-compatible sentence classifier."""
+    """sklearn-compatible sentence classifier backed by a bag-of-words neural network.
+
+    Implements the full sklearn estimator interface (``fit``, ``predict``,
+    ``score``, ``get_params``, ``set_params``) so it works directly with
+    ``GridSearchCV``, ``cross_val_score``, and similar utilities.
+
+    Attributes:
+        embed_dim: Embedding dimensionality.
+        epochs: Number of training epochs.
+        batch_size: Mini-batch size used during training.
+        lr: Adam learning rate.
+        random_state: Seed for reproducibility, or ``None`` for non-deterministic runs.
+        model: The underlying ``BasicTextClassifier``, or ``None`` before fitting.
+        vocab: ``VocabBuilder`` instance populated during ``fit``.
+        label_encoder: ``LabelEncoder`` instance populated during ``fit``.
+        device: Torch device (``cuda`` if available, else ``cpu``).
+    """
 
     def __init__(
         self,
@@ -58,6 +118,16 @@ class SentenceClassifier:
         lr: float = 0.005,
         random_state: Optional[int] = None,
     ):
+        """Initialise the classifier with training hyper-parameters.
+
+        Args:
+            embed_dim: Size of each token embedding vector.
+            epochs: Number of full passes over the training data.
+            batch_size: Number of samples per gradient update.
+            lr: Learning rate for the Adam optimiser.
+            random_state: Integer seed passed to Python, NumPy, and PyTorch
+                random generators. Set to an integer for reproducible results.
+        """
         self.embed_dim = embed_dim
         self.epochs = epochs
         self.batch_size = batch_size
@@ -76,6 +146,14 @@ class SentenceClassifier:
             torch.manual_seed(self.random_state)
 
     def get_params(self, deep=True):
+        """Return hyper-parameter names and values (sklearn estimator protocol).
+
+        Args:
+            deep: Ignored — included for sklearn API compatibility.
+
+        Returns:
+            Dictionary mapping parameter names to their current values.
+        """
         del deep
         return {
             "embed_dim": self.embed_dim,
@@ -86,6 +164,18 @@ class SentenceClassifier:
         }
 
     def set_params(self, **params):
+        """Set hyper-parameters by name (sklearn estimator protocol).
+
+        Args:
+            **params: Keyword arguments where each key is a valid parameter
+                name and the value is the new setting.
+
+        Returns:
+            The classifier instance (``self``), enabling method chaining.
+
+        Raises:
+            ValueError: If any key is not a recognised parameter name.
+        """
         for k, v in params.items():
             if not hasattr(self, k):
                 raise ValueError(f"Invalid parameter '{k}' for SentenceClassifier.")
@@ -93,6 +183,18 @@ class SentenceClassifier:
         return self
 
     def fit(self, X: List[str], y: List[str]):
+        """Build the vocabulary and train the model on labelled sentences.
+
+        Args:
+            X: Training sentences.
+            y: Corresponding class labels aligned with ``X``.
+
+        Returns:
+            The fitted classifier instance (``self``).
+
+        Raises:
+            ValueError: If ``X`` or ``y`` fail input validation.
+        """
         _validate_input(X, y)
         self._seed()
 
@@ -141,6 +243,18 @@ class SentenceClassifier:
         return self
 
     def predict(self, X: List[str]) -> List[str]:
+        """Predict the class label for each sentence in ``X``.
+
+        Args:
+            X: Sentences to classify.
+
+        Returns:
+            List of predicted label strings in the same order as ``X``.
+
+        Raises:
+            RuntimeError: If called before ``fit()`` or ``load()``.
+            ValueError: If ``X`` fails input validation.
+        """
         if self.model is None:
             raise RuntimeError("Model is not fitted. Call fit() or load() first.")
         _validate_input(X)
@@ -159,10 +273,34 @@ class SentenceClassifier:
         return out
 
     def score(self, X: List[str], y: List[str]) -> float:
+        """Return mean accuracy over the provided samples.
+
+        Args:
+            X: Sentences to classify.
+            y: True labels aligned with ``X``.
+
+        Returns:
+            Fraction of correctly classified samples (0.0 – 1.0).
+        """
         preds = self.predict(X)
         return sum(p == t for p, t in zip(preds, y)) / len(y)
 
     def train(self, sentences, labels, epochs=None, batch_size=None, lr=None):
+        """Train the classifier (deprecated — use ``fit()`` instead).
+
+        Args:
+            sentences: Training sentences.
+            labels: Corresponding class labels.
+            epochs: Override the instance ``epochs`` value for this run.
+            batch_size: Override the instance ``batch_size`` value for this run.
+            lr: Override the instance ``lr`` value for this run.
+
+        Returns:
+            The fitted classifier instance (``self``).
+
+        .. deprecated:: 0.2.0
+            Use :meth:`fit` instead. ``train()`` will be removed in v0.3.0.
+        """
         warnings.warn(
             "train() is deprecated and will be removed in v0.3.0. Use fit() instead.",
             DeprecationWarning,
@@ -177,6 +315,19 @@ class SentenceClassifier:
         return self.fit(sentences, labels)
 
     def save(self, save_dir: str):
+        """Persist the trained model and vocabulary metadata to disk.
+
+        Writes two files into ``save_dir``:
+
+        - ``model.pt`` — PyTorch state dict.
+        - ``metadata.json`` — vocab, label mapping, and hyper-parameters.
+
+        Args:
+            save_dir: Directory path to write artefacts into (created if absent).
+
+        Raises:
+            RuntimeError: If called before ``fit()``.
+        """
         if self.model is None:
             raise RuntimeError("No model to save.")
 
@@ -203,6 +354,14 @@ class SentenceClassifier:
             json.dump(meta, f)
 
     def load(self, save_dir: str):
+        """Restore a previously saved model from disk.
+
+        Reads ``model.pt`` and ``metadata.json`` from ``save_dir`` and
+        reconstructs the classifier so it is ready for inference.
+
+        Args:
+            save_dir: Directory that was passed to a previous ``save()`` call.
+        """
         with open(os.path.join(save_dir, "metadata.json"), "r") as f:
             meta = json.load(f)
 
