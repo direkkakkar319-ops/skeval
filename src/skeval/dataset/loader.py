@@ -9,7 +9,14 @@ from skeval.utils.helpers import LabelEncoder, VocabBuilder
 
 
 class SentenceDataset(Dataset):  # type: ignore[type-arg]
-    """PyTorch Dataset for sentences."""
+    """PyTorch ``Dataset`` that tokenises sentences on the fly.
+
+    Attributes:
+        sentences: Raw sentence strings.
+        labels: Corresponding label strings.
+        vocab: Fitted ``VocabBuilder`` used to encode sentences.
+        label_encoder: Fitted ``LabelEncoder`` used to encode labels.
+    """
 
     def __init__(
         self,
@@ -18,6 +25,14 @@ class SentenceDataset(Dataset):  # type: ignore[type-arg]
         vocab: VocabBuilder,
         label_encoder: LabelEncoder,
     ) -> None:
+        """Wrap sentence and label lists for use with a PyTorch DataLoader.
+
+        Args:
+            sentences: List of raw sentence strings.
+            labels: List of label strings aligned with ``sentences``.
+            vocab: Fitted vocabulary used to convert tokens to indices.
+            label_encoder: Fitted encoder used to convert labels to indices.
+        """
         self.sentences = sentences
         self.labels = labels
         self.vocab = vocab
@@ -27,6 +42,16 @@ class SentenceDataset(Dataset):  # type: ignore[type-arg]
         return len(self.sentences)
 
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Return the encoded sentence and label at position ``idx``.
+
+        Args:
+            idx: Integer index into the dataset.
+
+        Returns:
+            A 2-tuple ``(text_tensor, label_tensor)`` where ``text_tensor``
+            is a 1-D ``LongTensor`` of token indices and ``label_tensor`` is
+            a scalar ``LongTensor`` holding the class index.
+        """
         sentence = self.sentences[idx]
         label = self.labels[idx]
 
@@ -41,7 +66,20 @@ class SentenceDataset(Dataset):  # type: ignore[type-arg]
 def collate_fn(
     batch: List[Tuple[torch.Tensor, torch.Tensor]],
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    """Collate function to pad variable-length sentences in a batch."""
+    """Collate variable-length sentences into a single batch for EmbeddingBag.
+
+    EmbeddingBag expects a flat 1-D token tensor together with an offsets
+    tensor that marks where each sentence starts.
+
+    Args:
+        batch: List of ``(text_tensor, label_tensor)`` pairs returned by
+            ``SentenceDataset.__getitem__``.
+
+    Returns:
+        A 3-tuple ``(sentences, labels, offsets)`` where ``sentences`` is the
+        concatenated flat token tensor, ``labels`` is a 1-D label tensor, and
+        ``offsets`` is a 1-D tensor of sentence start positions.
+    """
     labels = []
     sentences = []
     offsets = [0]
@@ -59,13 +97,22 @@ def collate_fn(
 
 
 class DatasetLoader:
-    """Utility to load raw data from CSV or JSON into PyTorch DataLoaders."""
+    """Utility for loading raw data from CSV or JSONL into PyTorch DataLoaders."""
 
     @staticmethod
     def load_csv(
         filepath: str, text_col: str, label_col: str
     ) -> Tuple[List[str], List[str]]:
-        """Load sentences and labels from a CSV file."""
+        """Load sentences and labels from a CSV file.
+
+        Args:
+            filepath: Path to the CSV file.
+            text_col: Name of the column containing sentence text.
+            label_col: Name of the column containing class labels.
+
+        Returns:
+            A 2-tuple ``(sentences, labels)`` of equal-length string lists.
+        """
         df = pd.read_csv(filepath)
         return df[text_col].tolist(), df[label_col].tolist()
 
@@ -73,7 +120,18 @@ class DatasetLoader:
     def load_json(
         filepath: str, text_key: str, label_key: str
     ) -> Tuple[List[str], List[str]]:
-        """Load sentences and labels from a JSON lines file."""
+        """Load sentences and labels from a JSON lines file.
+
+        Each line must be a JSON object with at least the two specified keys.
+
+        Args:
+            filepath: Path to the ``.jsonl`` file.
+            text_key: Key whose value is the sentence text.
+            label_key: Key whose value is the class label.
+
+        Returns:
+            A 2-tuple ``(sentences, labels)`` of equal-length string lists.
+        """
         sentences: List[str] = []
         labels: List[str] = []
         with open(filepath, "r", encoding="utf-8") as f:
@@ -92,7 +150,20 @@ class DatasetLoader:
         batch_size: int = 32,
         shuffle: bool = True,
     ) -> DataLoader:  # type: ignore[type-arg]
-        """Create a PyTorch DataLoader from raw text and labels."""
+        """Wrap sentences and labels in a PyTorch DataLoader.
+
+        Args:
+            sentences: Raw sentence strings.
+            labels: Corresponding label strings.
+            vocab: Fitted ``VocabBuilder``.
+            label_encoder: Fitted ``LabelEncoder``.
+            batch_size: Number of samples per batch.
+            shuffle: Whether to shuffle the data each epoch.
+
+        Returns:
+            A ``DataLoader`` that yields ``(sentences, labels, offsets)``
+            batches compatible with ``BasicTextClassifier``.
+        """
         dataset = SentenceDataset(sentences, labels, vocab, label_encoder)
         return DataLoader(
             dataset, batch_size=batch_size, shuffle=shuffle, collate_fn=collate_fn

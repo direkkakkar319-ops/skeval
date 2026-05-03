@@ -13,6 +13,7 @@ It fills the gap that standard LLM benchmarks leave open: not *how fluent* the o
    usage
    architecture
    api
+   ecosystem
    changelog
    contributing
 

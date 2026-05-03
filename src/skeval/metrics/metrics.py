@@ -4,14 +4,25 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 
 
 def compute_metrics(y_true: List[str], y_pred: List[str]) -> Dict[str, Any]:
-    """Compute foundational evaluation metrics for Sentinel AI classifications.
+    """Compute classification metrics given true and predicted label sequences.
 
     Args:
-        y_true: Ground truth string labels.
-        y_pred: Predicted string labels.
+        y_true: Ground-truth label strings.
+        y_pred: Predicted label strings in the same order as ``y_true``.
 
     Returns:
-        Dictionary containing accuracy, detailed per-class stats, and confusion matrix.
+        Dictionary with the following keys:
+
+        - ``accuracy`` (float): Fraction of correctly classified samples.
+        - ``per_class`` (dict): Per-label dict of ``precision``, ``recall``,
+          ``f1-score``, and ``support``.
+        - ``macro_avg`` (dict): Macro-averaged precision, recall, and F1.
+        - ``weighted_avg`` (dict): Support-weighted precision, recall, and F1.
+        - ``confusion_matrix`` (list[list[int]]): Confusion matrix where rows
+          correspond to true labels and columns to predicted labels, ordered by
+          ``labels``.
+        - ``labels`` (list[str]): Sorted union of all labels seen in either
+          ``y_true`` or ``y_pred``.
     """
     acc = accuracy_score(y_true, y_pred)
 
