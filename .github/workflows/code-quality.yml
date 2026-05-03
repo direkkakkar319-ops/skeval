@@ -22,7 +22,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install black isort flake8
     - name: Check formatting (black)
-      run: black --check src/ tests/
+      run: black --check --target-version py310 src/ tests/
     - name: Check import order (isort)
       run: isort --check-only src/ tests/
     - name: Lint (flake8)
