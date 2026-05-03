@@ -117,6 +117,8 @@ class SentenceClassifier:
         batch_size: int = 32,
         lr: float = 0.005,
         random_state: Optional[int] = None,
+        num_workers: int = 0,
+        pin_memory: bool = False,
     ) -> None:
         """Initialise the classifier with training hyper-parameters.
 
@@ -127,12 +129,18 @@ class SentenceClassifier:
             lr: Learning rate for the Adam optimiser.
             random_state: Integer seed passed to Python, NumPy, and PyTorch
                 random generators. Set to an integer for reproducible results.
+            num_workers: Number of worker subprocesses for the DataLoader.
+                ``0`` (default) loads data in the main process.
+            pin_memory: Pin DataLoader output tensors to CUDA pinned memory.
+                Only beneficial when training on a GPU.
         """
         self.embed_dim = embed_dim
         self.epochs = epochs
         self.batch_size = batch_size
         self.lr = lr
         self.random_state = random_state
+        self.num_workers = num_workers
+        self.pin_memory = pin_memory
 
         self.model: Optional[BasicTextClassifier] = None
         self.vocab = VocabBuilder()
@@ -161,6 +169,8 @@ class SentenceClassifier:
             "batch_size": self.batch_size,
             "lr": self.lr,
             "random_state": self.random_state,
+            "num_workers": self.num_workers,
+            "pin_memory": self.pin_memory,
         }
 
     def set_params(self, **params: Any) -> "SentenceClassifier":
@@ -210,7 +220,13 @@ class SentenceClassifier:
         from skeval.dataset.loader import DatasetLoader
 
         loader = DatasetLoader.create_dataloader(
-            X, y, self.vocab, self.label_encoder, batch_size=self.batch_size
+            X,
+            y,
+            self.vocab,
+            self.label_encoder,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            pin_memory=self.pin_memory,
         )
 
         criterion = nn.CrossEntropyLoss()
@@ -242,8 +258,31 @@ class SentenceClassifier:
 
         return self
 
+    def _batch_forward(self, X: List[str]) -> List[torch.Tensor]:
+        """Run the model in batches and return a list of per-batch logit tensors."""
+        assert self.model is not None
+        self.model.eval()
+        batch_logits: List[torch.Tensor] = []
+        with torch.no_grad():
+            for i in range(0, len(X), self.batch_size):
+                batch = X[i : i + self.batch_size]
+                encoded = [self.vocab.encode(s) or [0] for s in batch]
+                offsets: List[int] = [0]
+                for ids in encoded:
+                    offsets.append(offsets[-1] + len(ids))
+                flat = [idx for ids in encoded for idx in ids]
+                text_t = torch.tensor(flat, dtype=torch.long, device=self.device)
+                offset_t = torch.tensor(
+                    offsets[:-1], dtype=torch.long, device=self.device
+                )
+                batch_logits.append(self.model(text_t, offset_t))
+        return batch_logits
+
     def predict(self, X: List[str]) -> List[str]:
         """Predict the class label for each sentence in ``X``.
+
+        Sentences are processed in mini-batches of size ``self.batch_size``
+        for efficient GPU utilisation.
 
         Args:
             X: Sentences to classify.
@@ -259,37 +298,34 @@ class SentenceClassifier:
             raise RuntimeError("Model is not fitted. Call fit() or load() first.")
         _validate_input(X)
 
-        self.model.eval()
-        out = []
-        with torch.no_grad():
-            for s in X:
-                ids = self.vocab.encode(s)
-                if not ids:
-                    ids = [0]
-                text = torch.tensor(ids, dtype=torch.long, device=self.device)
-                offset = torch.zeros(1, dtype=torch.long, device=self.device)
-                logits = self.model(text, offset)
-                out.append(self.label_encoder.decode(logits.argmax(1).item()))
+        out: List[str] = []
+        for logits in self._batch_forward(X):
+            for idx in logits.argmax(1).tolist():
+                out.append(self.label_encoder.decode(idx))
         return out
 
     def predict_proba(self, X: List[str]) -> np.ndarray:
-        """Return class probabilities for each sample, shape (n_samples, n_classes)."""
+        """Return class probabilities for each sample, shape ``(n_samples, n_classes)``.
+
+        Args:
+            X: Sentences to classify.
+
+        Returns:
+            Float array of shape ``(n_samples, n_classes)`` with softmax
+            probabilities.
+
+        Raises:
+            RuntimeError: If called before ``fit()`` or ``load()``.
+            ValueError: If ``X`` fails input validation.
+        """
         if self.model is None:
             raise RuntimeError("Model is not fitted. Call fit() or load() first.")
         _validate_input(X)
 
-        self.model.eval()
-        probs = []
-        with torch.no_grad():
-            for s in X:
-                ids = self.vocab.encode(s)
-                if not ids:
-                    ids = [0]
-                text = torch.tensor(ids, dtype=torch.long, device=self.device)
-                offset = torch.zeros(1, dtype=torch.long, device=self.device)
-                logits = self.model(text, offset)
-                probs.append(torch.softmax(logits, dim=1).cpu().numpy()[0])
-        return np.array(probs)
+        rows: List[np.ndarray] = []
+        for logits in self._batch_forward(X):
+            rows.append(torch.softmax(logits, dim=1).cpu().numpy())
+        return np.vstack(rows)
 
     def score(self, X: List[str], y: List[str]) -> float:
         """Return mean accuracy over the provided samples.
