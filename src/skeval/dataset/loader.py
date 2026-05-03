@@ -149,6 +149,8 @@ class DatasetLoader:
         label_encoder: LabelEncoder,
         batch_size: int = 32,
         shuffle: bool = True,
+        num_workers: int = 0,
+        pin_memory: bool = False,
     ) -> DataLoader:
         """Wrap sentences and labels in a PyTorch DataLoader.
 
@@ -159,6 +161,11 @@ class DatasetLoader:
             label_encoder: Fitted ``LabelEncoder``.
             batch_size: Number of samples per batch.
             shuffle: Whether to shuffle the data each epoch.
+            num_workers: Number of subprocesses for data loading. ``0`` means
+                data is loaded in the main process.
+            pin_memory: If ``True``, the DataLoader copies tensors to CUDA
+                pinned memory before returning them. Only useful when training
+                on a GPU.
 
         Returns:
             A ``DataLoader`` that yields ``(sentences, labels, offsets)``
@@ -166,5 +173,10 @@ class DatasetLoader:
         """
         dataset = SentenceDataset(sentences, labels, vocab, label_encoder)
         return DataLoader(
-            dataset, batch_size=batch_size, shuffle=shuffle, collate_fn=collate_fn
+            dataset,
+            batch_size=batch_size,
+            shuffle=shuffle,
+            collate_fn=collate_fn,
+            num_workers=num_workers,
+            pin_memory=pin_memory,
         )
