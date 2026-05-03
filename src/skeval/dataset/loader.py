@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader, Dataset
 from skeval.utils.helpers import LabelEncoder, VocabBuilder
 
 
-class SentenceDataset(Dataset):  # type: ignore[type-arg]
+class SentenceDataset(Dataset):  # type: ignore[misc]
     """PyTorch ``Dataset`` that tokenises sentences on the fly.
 
     Attributes:
@@ -149,7 +149,7 @@ class DatasetLoader:
         label_encoder: LabelEncoder,
         batch_size: int = 32,
         shuffle: bool = True,
-    ) -> DataLoader:  # type: ignore[type-arg]
+    ) -> DataLoader:
         """Wrap sentences and labels in a PyTorch DataLoader.
 
         Args:

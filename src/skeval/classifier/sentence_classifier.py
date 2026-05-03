@@ -39,7 +39,7 @@ def _validate_input(X: List[str], y: Optional[List[str]] = None) -> None:
             )
 
 
-class BasicTextClassifier(nn.Module):
+class BasicTextClassifier(nn.Module):  # type: ignore[misc]
     """EmbeddingBag + Linear text classifier.
 
     A lightweight bag-of-words model: token indices are averaged by
@@ -88,7 +88,7 @@ class BasicTextClassifier(nn.Module):
             ``FloatTensor`` of shape ``(batch_size, num_classes)`` containing
             raw (pre-softmax) class scores.
         """
-        return self.fc(self.embedding(text, offsets))  # type: ignore[no-any-return]
+        return self.fc(self.embedding(text, offsets))
 
 
 class SentenceClassifier:
@@ -304,7 +304,7 @@ class SentenceClassifier:
         preds = self.predict(X)
         return sum(p == t for p, t in zip(preds, y)) / len(y)
 
-    def train(  # type: ignore[override]
+    def train(
         self,
         sentences: List[str],
         labels: List[str],
