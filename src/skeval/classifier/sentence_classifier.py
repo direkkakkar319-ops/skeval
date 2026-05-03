@@ -258,9 +258,7 @@ class SentenceClassifier:
 
         return self
 
-    def _batch_forward(
-        self, X: List[str]
-    ) -> List[torch.Tensor]:
+    def _batch_forward(self, X: List[str]) -> List[torch.Tensor]:
         """Run the model in batches and return a list of per-batch logit tensors."""
         assert self.model is not None
         self.model.eval()
