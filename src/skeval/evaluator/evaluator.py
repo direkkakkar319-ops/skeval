@@ -6,7 +6,7 @@ from skeval.metrics.metrics import compute_metrics
 class Evaluator:
     """Evaluates classifier predictions against ground-truth labels."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def evaluate(

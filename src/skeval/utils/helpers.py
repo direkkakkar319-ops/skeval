@@ -32,7 +32,7 @@ class VocabBuilder:
         is_built: Whether ``build()`` has been called.
     """
 
-    def __init__(self, min_freq: int = 1):
+    def __init__(self, min_freq: int = 1) -> None:
         """Initialise an empty vocabulary.
 
         Args:
@@ -43,7 +43,7 @@ class VocabBuilder:
         # Reserve 0 for padding, 1 for unknown words
         self.word2idx: Dict[str, int] = {"<PAD>": 0, "<UNK>": 1}
         self.idx2word: Dict[int, str] = {0: "<PAD>", 1: "<UNK>"}
-        self.is_built = False
+        self.is_built: bool = False
 
     def build(self, sentences: List[str]) -> None:
         """Populate ``word2idx`` and ``idx2word`` from a list of sentences.
@@ -97,10 +97,10 @@ class LabelEncoder:
         is_built: Whether ``build()`` has been called.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.label2idx: Dict[str, int] = {}
         self.idx2label: Dict[int, str] = {}
-        self.is_built = False
+        self.is_built: bool = False
 
     def build(self, labels: List[str]) -> None:
         """Assign a unique integer index to each unique label.
@@ -108,7 +108,7 @@ class LabelEncoder:
         Args:
             labels: Full list of training labels (duplicates allowed).
         """
-        unique_labels = sorted(list(set(labels)))
+        unique_labels = sorted(set(labels))
         for idx, label in enumerate(unique_labels):
             self.label2idx[label] = idx
             self.idx2label[idx] = label

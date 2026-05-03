@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 
-def _train(args):
+def _train(args: argparse.Namespace) -> None:
     from skeval.classifier import SentenceClassifier
     from skeval.dataset.loader import DatasetLoader
 
@@ -34,7 +34,7 @@ def _train(args):
     print(f"Model saved to {args.save_dir}")
 
 
-def _evaluate(args):
+def _evaluate(args: argparse.Namespace) -> None:
     from skeval.classifier import SentenceClassifier
     from skeval.dataset.loader import DatasetLoader
     from skeval.evaluator import Evaluator
@@ -76,7 +76,7 @@ def _evaluate(args):
         print(f"Results saved to {args.output}")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         prog="skeval",
         description="Sentinel AI — Semantic Evaluation Layer for LLMs",

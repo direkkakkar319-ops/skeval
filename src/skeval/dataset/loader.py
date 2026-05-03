@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader, Dataset
 from skeval.utils.helpers import LabelEncoder, VocabBuilder
 
 
-class SentenceDataset(Dataset):
+class SentenceDataset(Dataset):  # type: ignore[misc]
     """PyTorch ``Dataset`` that tokenises sentences on the fly.
 
     Attributes:
@@ -24,7 +24,7 @@ class SentenceDataset(Dataset):
         labels: List[str],
         vocab: VocabBuilder,
         label_encoder: LabelEncoder,
-    ):
+    ) -> None:
         """Wrap sentence and label lists for use with a PyTorch DataLoader.
 
         Args:
@@ -38,10 +38,10 @@ class SentenceDataset(Dataset):
         self.vocab = vocab
         self.label_encoder = label_encoder
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.sentences)
 
-    def __getitem__(self, idx) -> Tuple[torch.Tensor, torch.Tensor]:
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
         """Return the encoded sentence and label at position ``idx``.
 
         Args:
@@ -63,7 +63,9 @@ class SentenceDataset(Dataset):
         )
 
 
-def collate_fn(batch):
+def collate_fn(
+    batch: List[Tuple[torch.Tensor, torch.Tensor]],
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """Collate variable-length sentences into a single batch for EmbeddingBag.
 
     EmbeddingBag expects a flat 1-D token tensor together with an offsets
@@ -87,11 +89,11 @@ def collate_fn(batch):
         sentences.append(text_tensor)
         offsets.append(text_tensor.size(0))
 
-    labels = torch.tensor(labels, dtype=torch.long)
-    offsets = torch.tensor(offsets[:-1]).cumsum(dim=0)
-    sentences = torch.cat(sentences)
+    labels_t = torch.tensor(labels, dtype=torch.long)
+    offsets_t = torch.tensor(offsets[:-1]).cumsum(dim=0)
+    sentences_t = torch.cat(sentences)
 
-    return sentences, labels, offsets
+    return sentences_t, labels_t, offsets_t
 
 
 class DatasetLoader:
@@ -130,8 +132,8 @@ class DatasetLoader:
         Returns:
             A 2-tuple ``(sentences, labels)`` of equal-length string lists.
         """
-        sentences = []
-        labels = []
+        sentences: List[str] = []
+        labels: List[str] = []
         with open(filepath, "r", encoding="utf-8") as f:
             for line in f:
                 data = json.loads(line)

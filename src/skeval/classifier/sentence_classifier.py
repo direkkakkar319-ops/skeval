@@ -2,7 +2,7 @@ import json
 import os
 import random
 import warnings
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import torch
@@ -12,7 +12,7 @@ from tqdm import tqdm
 from skeval.utils.helpers import LabelEncoder, VocabBuilder
 
 
-def _validate_input(X, y=None):
+def _validate_input(X: List[str], y: Optional[List[str]] = None) -> None:
     """Raise ``ValueError`` if ``X`` or ``y`` are malformed.
 
     Args:
@@ -39,7 +39,7 @@ def _validate_input(X, y=None):
             )
 
 
-class BasicTextClassifier(nn.Module):
+class BasicTextClassifier(nn.Module):  # type: ignore[misc]
     """EmbeddingBag + Linear text classifier.
 
     A lightweight bag-of-words model: token indices are averaged by
@@ -51,7 +51,7 @@ class BasicTextClassifier(nn.Module):
         fc: Linear layer that projects the averaged embedding to class logits.
     """
 
-    def __init__(self, vocab_size: int, embed_dim: int, num_classes: int):
+    def __init__(self, vocab_size: int, embed_dim: int, num_classes: int) -> None:
         """Build the embedding and linear layers and initialise weights.
 
         Args:
@@ -65,7 +65,7 @@ class BasicTextClassifier(nn.Module):
         self.fc = nn.Linear(embed_dim, num_classes)
         self.init_weights()
 
-    def init_weights(self):
+    def init_weights(self) -> None:
         """Initialise embedding and linear weights with a uniform distribution.
 
         Weights are drawn from ``Uniform(-0.5, 0.5)`` and biases are set to
@@ -76,7 +76,7 @@ class BasicTextClassifier(nn.Module):
         self.fc.weight.data.uniform_(-r, r)
         self.fc.bias.data.zero_()
 
-    def forward(self, text, offsets):
+    def forward(self, text: torch.Tensor, offsets: torch.Tensor) -> torch.Tensor:
         """Compute class logits for a batch of sentences.
 
         Args:
@@ -117,7 +117,7 @@ class SentenceClassifier:
         batch_size: int = 32,
         lr: float = 0.005,
         random_state: Optional[int] = None,
-    ):
+    ) -> None:
         """Initialise the classifier with training hyper-parameters.
 
         Args:
@@ -134,18 +134,18 @@ class SentenceClassifier:
         self.lr = lr
         self.random_state = random_state
 
-        self.model = None
+        self.model: Optional[BasicTextClassifier] = None
         self.vocab = VocabBuilder()
         self.label_encoder = LabelEncoder()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    def _seed(self):
+    def _seed(self) -> None:
         if self.random_state is not None:
             random.seed(self.random_state)
             np.random.seed(self.random_state)
             torch.manual_seed(self.random_state)
 
-    def get_params(self, deep=True):
+    def get_params(self, deep: bool = True) -> Dict[str, Any]:
         """Return hyper-parameter names and values (sklearn estimator protocol).
 
         Args:
@@ -163,7 +163,7 @@ class SentenceClassifier:
             "random_state": self.random_state,
         }
 
-    def set_params(self, **params):
+    def set_params(self, **params: Any) -> "SentenceClassifier":
         """Set hyper-parameters by name (sklearn estimator protocol).
 
         Args:
@@ -182,7 +182,7 @@ class SentenceClassifier:
             setattr(self, k, v)
         return self
 
-    def fit(self, X: List[str], y: List[str]):
+    def fit(self, X: List[str], y: List[str]) -> "SentenceClassifier":
         """Build the vocabulary and train the model on labelled sentences.
 
         Args:
@@ -304,7 +304,14 @@ class SentenceClassifier:
         preds = self.predict(X)
         return sum(p == t for p, t in zip(preds, y)) / len(y)
 
-    def train(self, sentences, labels, epochs=None, batch_size=None, lr=None):
+    def train(
+        self,
+        sentences: List[str],
+        labels: List[str],
+        epochs: Optional[int] = None,
+        batch_size: Optional[int] = None,
+        lr: Optional[float] = None,
+    ) -> "SentenceClassifier":
         """Train the classifier (deprecated — use ``fit()`` instead).
 
         Args:
@@ -333,7 +340,7 @@ class SentenceClassifier:
             self.lr = lr
         return self.fit(sentences, labels)
 
-    def save(self, save_dir: str):
+    def save(self, save_dir: str) -> None:
         """Persist the trained model and vocabulary metadata to disk.
 
         Writes two files into ``save_dir``:
@@ -372,7 +379,7 @@ class SentenceClassifier:
         with open(os.path.join(save_dir, "metadata.json"), "w") as f:
             json.dump(meta, f)
 
-    def load(self, save_dir: str):
+    def load(self, save_dir: str) -> None:
         """Restore a previously saved model from disk.
 
         Reads ``model.pt`` and ``metadata.json`` from ``save_dir`` and
